@@ -183,7 +183,11 @@ if __name__ == "__main__":
 
     print(f'{timestamp()} finished preparing dataset')
 
-    n_layers = MODEL_N_LAYERS[args['model']]
+    # if model is 'deduped' then it should map to the same entry in MODEL_N_LAYERS
+    if args['model'].endswith('-deduped'):
+        n_layers = MODEL_N_LAYERS[args['model'][:-8]]
+    else:
+        n_layers = MODEL_N_LAYERS[args['model']]
     # for parallelization on cluster
     task_id = int(os.getenv('SLURM_ARRAY_TASK_ID', 1))
     task_count = int(os.getenv('SLURM_ARRAY_TASK_COUNT', 1))
