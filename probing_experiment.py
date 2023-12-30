@@ -5,6 +5,7 @@ import time
 import argparse
 import math
 import json
+from tqdm import tqdm
 
 import torch
 import numpy as np
@@ -20,6 +21,7 @@ from experiments.activations import *
 from experiments.probes import *
 from experiments.metrics import *
 from experiments.inner_loops import *
+
 
 
 def save_result(exp_cfg, result, inner_loop_name, feature_name):
@@ -87,7 +89,7 @@ def run_probe_on_layer(exp_cfg, tokenized_dataset, feature_datasets, layer):
     # Run the probing experiments
     skip_features = get_skip_features(exp_cfg, feature_datasets.keys())
     results = {inner_loop: {} for inner_loop in exp_cfg.experiment_type}
-    for feature_name, feature_data in feature_datasets.items():
+    for feature_name, feature_data in tqdm(feature_datasets.items()):
         # prepare the feature specific dataset
         if feature_name in skip_features:
             continue

@@ -2,6 +2,7 @@ import time
 import math
 import copy
 import numpy as np
+from tqdm import tqdm
 
 from sklearn.feature_selection import f_classif, mutual_info_classif
 from sklearn.linear_model import LogisticRegression
@@ -169,7 +170,7 @@ def optimal_sparse_probing(exp_cfg, activation_dataset, feature_labels, regulari
     ks = make_k_list(d_act, exp_cfg.osp_upto_k)
 
     layer_results = {}
-    for k in ks[::-1]:  # iterate in descending order
+    for k in tqdm(ks[::-1]):  # iterate in descending order
         # warm start - set max_k highest scores to 1
         s0 = np.zeros_like(coef_filter)
         s0[np.argsort(scores)[-k:]] = 1

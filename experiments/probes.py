@@ -15,7 +15,7 @@ def generate_gradient_cut(X, y, s, reg, weights):
     X_sub = X[:, indices]
     n, k = X_sub.shape
 
-    sub_env = gp.Env()  # need env for cluster
+    sub_env = gp.Env(params={"OutputFlag": 0})  # need env for cluster
     model = gp.Model("subproblem", env=sub_env)
     model.params.OutputFlag = 0
 
@@ -51,7 +51,7 @@ def generate_gradient_cut_gurobi95(X, y, s, reg, weights=1):
     X_sub = X[:, indices]
     n, k = X_sub.shape
 
-    sub_env = gp.Env()  # need env for cluster
+    sub_env = gp.Env(params={"OutputFlag": 0})  # need env for cluster
     model = gp.Model("subproblem", env=sub_env)
     model.params.OutputFlag = 0
 
@@ -89,7 +89,7 @@ def sparse_classification_oa(X, Y, k, reg, s0, weights=1, time_limit=60, verbose
     if isinstance(weights, int) and weights == 1:
         weights = np.ones(n)
 
-    gp_env = gp.Env()  # need env for cluster
+    gp_env = gp.Env( params={"OutputFlag": 0})  # need env for cluster
     model = gp.Model("classifier", env=gp_env)
 
     s = model.addVars(d, vtype=gp.GRB.BINARY, name="support")
