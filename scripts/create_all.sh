@@ -1,5 +1,10 @@
 #!/bin/bash
+#SBATCH -o log/activation_all.log-%j
+#SBATCH -c 4
+#SBATCH --gres=gpu:1
 
+source env_vars.sh
+cd /home/jackk/sparse-probing-paper
 # Assuming the datasets are in the ../superposition/sparse_datasets/ directory
 datasets_dir="../superposition/sparse_datasets"
 

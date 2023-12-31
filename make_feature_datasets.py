@@ -39,6 +39,9 @@ WIKIDATA_TABLE_PATH = '/home/gridsan/groups/maia_mechint/datasets/wikidata/wikid
 ARXIV_SUBSET_PATH = os.path.join(
     os.environ['HF_DATASETS_CACHE'], 'arxiv_dataset.hf')
 
+PILE_EVEN_SPLITS_PATH = PILE_SUBSET_PATH
+PILE_TEST_PATH = PILE_SUBSET_PATH
+
 
 TEXT_FEATURES = {
     'text_features': token_supervised.true_binary_token_supervised_feature_conditions,
