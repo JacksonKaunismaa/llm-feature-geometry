@@ -3,6 +3,7 @@ import math
 import copy
 import numpy as np
 from tqdm import tqdm
+import os
 
 from sklearn.feature_selection import f_classif, mutual_info_classif
 from sklearn.linear_model import LogisticRegression
@@ -149,6 +150,9 @@ def optimal_sparse_probing(exp_cfg, activation_dataset, feature_labels, regulari
     feature_labels : np.ndarray (n_samples) with labels -1 or +1.
     regularization : float, optional defaults to 1/n**0.5
     """
+    import gurobipy as gp
+    os.environ['GRB_LICENSE_FILE'] = "/home/jackk/gurobi.lic"
+
     X_train, X_test, y_train, y_test = split_and_preprocess(
         exp_cfg, activation_dataset, feature_labels)
 
@@ -170,6 +174,7 @@ def optimal_sparse_probing(exp_cfg, activation_dataset, feature_labels, regulari
     ks = make_k_list(d_act, exp_cfg.osp_upto_k)
 
     layer_results = {}
+    gp_env = gp.Env(params={'OutputFlag': 0})
     for k in tqdm(ks[::-1]):  # iterate in descending order
         # warm start - set max_k highest scores to 1
         s0 = np.zeros_like(coef_filter)
@@ -177,7 +182,7 @@ def optimal_sparse_probing(exp_cfg, activation_dataset, feature_labels, regulari
 
         model_stats, filtered_support, beta, bias = sparse_classification_oa(
             X_train[:, coef_filter], y_train, k,
-            regularization, s0=s0, weights=class_weights,
+            regularization, s0=s0, gp_env=gp_env, weights=class_weights,
             time_limit=exp_cfg.gurobi_timeout, verbose=exp_cfg.gurobi_verbose
         )
         support = coef_filter[filtered_support]

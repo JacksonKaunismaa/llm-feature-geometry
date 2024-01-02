@@ -9,14 +9,14 @@ import random
 import math
 
 
-def generate_gradient_cut(X, y, s, reg, weights):
+def generate_gradient_cut(X, y, s, reg, weights, env):
     indices = s > 0.5
 
     X_sub = X[:, indices]
     n, k = X_sub.shape
 
-    sub_env = gp.Env(params={"OutputFlag": 0})  # need env for cluster
-    model = gp.Model("subproblem", env=sub_env)
+    # sub_env = gp.Env(params={"OutputFlag": 0})  # need env for cluster
+    model = gp.Model("subproblem", env=env)
     model.params.OutputFlag = 0
 
     alpha = model.addMVar(n, vtype=gp.GRB.CONTINUOUS,
@@ -40,19 +40,19 @@ def generate_gradient_cut(X, y, s, reg, weights):
     grad = -(reg / 2) * (X.T @ alpha_vals) ** 2
 
     model.dispose()
-    sub_env.dispose()
+    # sub_env.dispose()
 
     return obj, grad, alpha_vals
 
 
-def generate_gradient_cut_gurobi95(X, y, s, reg, weights=1):
+def generate_gradient_cut_gurobi95(X, y, s, reg, env, weights=1):
     indices = s > 0.5
 
     X_sub = X[:, indices]
     n, k = X_sub.shape
 
-    sub_env = gp.Env(params={"OutputFlag": 0})  # need env for cluster
-    model = gp.Model("subproblem", env=sub_env)
+    # sub_env = gp.Env(params={"OutputFlag": 0})  # need env for cluster
+    model = gp.Model("subproblem", env=env)
     model.params.OutputFlag = 0
 
     alpha = model.addVars(n, vtype=gp.GRB.CONTINUOUS,
@@ -78,18 +78,18 @@ def generate_gradient_cut_gurobi95(X, y, s, reg, weights=1):
     grad = -(reg / 2) * (X.T @ alpha_vals) ** 2
 
     model.dispose()
-    sub_env.dispose()
+    # sub_env.dispose()
 
     return obj, grad, alpha_vals
 
 
-def sparse_classification_oa(X, Y, k, reg, s0, weights=1, time_limit=60, verbose=True):
+def sparse_classification_oa(X, Y, k, reg, s0, gp_env, weights=1, time_limit=60, verbose=True):
     n, d = X.shape
 
     if isinstance(weights, int) and weights == 1:
         weights = np.ones(n)
 
-    gp_env = gp.Env( params={"OutputFlag": 0})  # need env for cluster
+    # gp_env = gp.Env( params={"OutputFlag": 0})  # need env for cluster
     model = gp.Model("classifier", env=gp_env)
 
     s = model.addVars(d, vtype=gp.GRB.BINARY, name="support")
@@ -99,7 +99,7 @@ def sparse_classification_oa(X, Y, k, reg, s0, weights=1, time_limit=60, verbose
     # model.addConstr(s[d-1] == 1)
 
     obj0, grad0, alpha0 = generate_gradient_cut(
-        X, Y, s0, reg, weights)
+        X, Y, s0, reg, gp_env, weights)
     model.addConstr(
         t >= obj0 + gp.quicksum(grad0[i] * (s[i] - s0[i]) for i in range(d)))
     model.setObjective(t, gp.GRB.MINIMIZE)
@@ -113,7 +113,7 @@ def sparse_classification_oa(X, Y, k, reg, s0, weights=1, time_limit=60, verbose
             s_vals = np.array([a for a in s_bar.values()])
 
             obj, grad, alpha = generate_gradient_cut(
-                X, Y, s_vals, reg, weights)
+                X, Y, s_vals, reg, gp_env, weights)
             nonlocal alpha_opt
             alpha_opt = alpha
             nonlocal n_cuts_added
@@ -149,7 +149,7 @@ def sparse_classification_oa(X, Y, k, reg, s0, weights=1, time_limit=60, verbose
     }
 
     model.dispose()
-    gp_env.dispose()
+    # gp_env.dispose()
 
     # return bias separately
     return model_stats, support_indices, beta_opt, bias

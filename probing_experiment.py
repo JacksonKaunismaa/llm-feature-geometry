@@ -1,3 +1,4 @@
+print("hi from python")
 import os
 import pickle
 import random
@@ -6,22 +7,30 @@ import argparse
 import math
 import json
 from tqdm import tqdm
+print("did standard imports")
 
 import torch
+print("did torch import")
 import numpy as np
 from sklearn.metrics import *
+print("did sklearn imports")
 
 from load import *
+print("did load imports")
 from config import *
+print("did config imports")
 from utils import timestamp, seed_all, default_argument_parser, MODEL_N_LAYERS
+print("did utils imports")
 from make_feature_datasets import prepare_feature_dataset
+print("did make_feature_datasets import")
 from activations.activation_probing_dataset import make_index_mask, load_activation_probing_dataset
+print("did activations imports")
 
 from experiments.activations import *
 from experiments.probes import *
 from experiments.metrics import *
 from experiments.inner_loops import *
-
+print("did experiments imports")
 
 
 def save_result(exp_cfg, result, inner_loop_name, feature_name):

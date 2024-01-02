@@ -1,4 +1,4 @@
-export RESULTS_DIR=./results
+export RESULTS_DIR=/home/jackk/projects/def-papyan/jackk/results
 export FEATURE_DATASET_DIR=/home/jackk/projects/def-papyan/jackk/sparse_datasets
 export TRANSFORMERS_CACHE=/home/jackk/projects/def-papyan/jackk/downloads
 export HF_DATASETS_CACHE=/home/jackk/projects/def-papyan/jackk/downloads
