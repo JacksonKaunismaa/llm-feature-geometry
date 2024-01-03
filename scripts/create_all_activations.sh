@@ -2,26 +2,27 @@
 #SBATCH -o log/activation_all.log-%j
 #SBATCH -c 4
 
+module load gcc/9.3.0 arrow/13.0.0
 source /home/jackk/.bashrc
 source env_vars.sh
+# module list
+# echo "hi"
+# pip3 list
+# which python3
+# echo "hihlcroe"
 module list
-echo "hi"
+which python3
+# echo "HOME"
+# ls /home/jackk
+# echo "DEF-PAPYAN"
+# ls /home/jackk/projects/def-papyan/jackk
+# echo "SCRATCH"
+# ls /home/jackk/scratch
+# echo "PWD"
+# pwd
+# ls 
 pip3 list
-which python3
-echo "hihlcroe"
-module load gcc/9.3.0 arrow/13.0.0
-module list
-which python3
-echo "HOME"
-ls /home/jackk
-echo "DEF-PAPYAN"
-ls /home/jackk/projects/def-papyan/jackk
-echo "SCRATCH"
-ls /home/jackk/scratch
-echo "PWD"
-pwd
-ls 
-cd /home/jackk/sparse-probing-paper
+cd /home/jackk/scratch/sparse-probing-paper
 # Assuming the datasets are in the ../superposition/sparse_datasets/ directory
 datasets_dir="/home/jackk/projects/def-papyan/jackk/sparse_datasets"
 

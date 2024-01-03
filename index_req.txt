@@ -3,3 +3,4 @@ conllu
 circuitsvis
 sparqlwrapper
 numba
+transformers
