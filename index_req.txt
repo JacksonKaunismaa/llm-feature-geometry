@@ -4,3 +4,4 @@ circuitsvis
 sparqlwrapper
 numba
 transformers
+datasets

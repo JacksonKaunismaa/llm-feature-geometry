@@ -5,7 +5,8 @@
 module load gcc/9.3.0 arrow/13.0.0
 source /home/jackk/.bashrc
 source env_vars.sh
-source /home/jackk/.venv/interp/bin/activate
+source /home/jackk/interp/bin/activate
+module load gcc/9.3.0 arrow/13.0.0
 # module list
 # echo "hi"
 # pip3 list
@@ -13,6 +14,8 @@ source /home/jackk/.venv/interp/bin/activate
 # echo "hihlcroe"
 module list
 which python3
+echo "INSTALLING"
+pip3 install transformer_lens
 # echo "HOME"
 # ls /home/jackk
 # echo "DEF-PAPYAN"
