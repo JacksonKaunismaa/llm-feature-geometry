@@ -5,6 +5,7 @@
 module load gcc/9.3.0 arrow/13.0.0
 source /home/jackk/.bashrc
 source env_vars.sh
+source /home/jackk/.venv/interp/bin/activate
 # module list
 # echo "hi"
 # pip3 list
@@ -22,7 +23,7 @@ which python3
 # pwd
 # ls 
 pip3 list
-cd /home/jackk/scratch/sparse-probing-paper
+cd /home/jackk/sparse-probing-paper
 # Assuming the datasets are in the ../superposition/sparse_datasets/ directory
 datasets_dir="/home/jackk/projects/def-papyan/jackk/sparse_datasets"
 

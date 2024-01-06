@@ -1,10 +1,13 @@
 #!/bin/bash
-#SBATCH -o log/activation_all.log-%j-%a
-#SBATCH -c 3
+#SBATCH -o log/activation_all.log.%j-%a
+#SBATCH -c 24
+#SBATCH -a 1-16
+#SBATCH --mem-per-cpu=4G
+#SBATCH -N 1
+
 
 source /home/jackk/.bashrc
-source env_vars.sh
-module load gurobi
+source /home/jackk/.venv/interp/bin/activate
 # source env_vars.sh
 
 module list
@@ -13,7 +16,9 @@ module list
 which python3
 # echo "hihlcroe"
 module load gcc/9.3.0 arrow/13.0.0
+module load gurobi/10.0.3
 module list
+source env_vars.sh
 # which python3
 # echo "HOME"
 # ls /home/jackk
@@ -23,7 +28,13 @@ module list
 # ls /home/jackk/scratch
 # echo "PWD"
 # pwd
-# ls 
+# ls
+which python3
+pip3 install --no-index scikit_learn
+cd /home/jackk/gurobi_install
+python3 setup.py build install
+pip3 list
+
 cd /home/jackk/sparse-probing-paper
 # Assuming the datasets are in the ../superposition/sparse_datasets/ directory
 datasets_dir="/home/jackk/projects/def-papyan/jackk/sparse_datasets"

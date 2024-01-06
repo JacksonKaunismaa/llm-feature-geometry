@@ -4,3 +4,4 @@ export TRANSFORMERS_CACHE=/home/jackk/projects/def-papyan/jackk/downloads
 export HF_DATASETS_CACHE=/home/jackk/projects/def-papyan/jackk/downloads
 export HF_HOME=/home/jackk/projects/def-papyan/jackk/downloads
 export HF_HUB_OFFLINE=1
+export GRB_LICENSE_FILE=/home/jackk/gurobi.lic
