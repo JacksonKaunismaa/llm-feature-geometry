@@ -12,10 +12,14 @@ def quantize_8bit(input):
     Returns:
         torch.Tensor: The quantized tensor.
     """
+    print('starting quantize_8bit')
     offset = input.min(axis=0).values
+    print('did offset')
     scale = (input.max(axis=0).values - offset) / 255
+    print('did scale, closest to 0 is', abs(scale).min())
     quant = ((input - offset) / scale).float().round().clamp(0,
                                                              255).to(torch.uint8)
+    print('did quant')
     return quant, offset, scale
 
 

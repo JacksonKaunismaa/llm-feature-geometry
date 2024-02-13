@@ -25,16 +25,22 @@ def make_k_list(d_max, max_k=None):
     return [k for k in base_ks + exp_ks if k <= max_k]
 
 
+def maybe_normalize(exp_cfg, X_train, X_test=None):
+    if exp_cfg.normalize_activations:
+        neuron_std = np.maximum(X_train.std(axis=0), 1e-3)
+        # x10 for numerical stability (most neurons have std < 1)
+        X_train /= (neuron_std * 10)
+        if X_test is not None:
+            X_test /= (neuron_std * 10)
+    return X_train, X_test
+
+
 def split_and_preprocess(exp_cfg, activation_dataset, feature_labels):
     X_train, X_test, y_train, y_test = train_test_split(
         activation_dataset, feature_labels,
         test_size=exp_cfg.test_set_frac, random_state=exp_cfg.seed)
 
-    if exp_cfg.normalize_activations:
-        neuron_std = np.maximum(X_train.std(axis=0), 1e-3)
-        # x10 for numerical stability (most neurons have std < 1)
-        X_train /= (neuron_std * 10)
-        X_test /= (neuron_std * 10)
+    X_train, X_test = maybe_normalize(exp_cfg, X_train, X_test)
 
     return X_train, X_test, y_train, y_test
 
@@ -68,6 +74,28 @@ def dense_probe(exp_cfg, activation_dataset, feature_labels):
     results = get_binary_cls_perf_metrics(y_test, lr_pred, lr_score)
     results['elapsed_time'] = elapsed_time
     results['coef'] = lr.coef_[0]
+    return results
+
+def average_activation(exp_cfg, activation_dataset, feature_labels):
+    """
+    Find average activation of positive class at probe_indices.
+    Idea is that if the activations are feature+other_features, then
+    other_features will average out to 0 (probably false? since other_features
+    could contain features highly correlated with feature that appear in all samples)
+    Subtracting global average must be done as post-processing step.
+
+    Parameters
+    ----------
+    exp_cfg : as specified by the CLI in probing_experiment.py
+    activation_dataset : np.ndarray (n_samples, n_neurons)
+    feature_labels : np.ndarray (n_samples) with labels -1 or +1.
+    """
+    activation_dataset = maybe_normalize(exp_cfg, activation_dataset)[0]
+    start_t = time.time()
+    pos_only = activation_dataset[feature_labels == 1]
+    pos_mean = pos_only.mean(axis=0)
+    elapsed_time = time.time() - start_t
+    results = {'elapsed_time': elapsed_time, 'coef': pos_mean}
     return results
 
 
@@ -151,7 +179,6 @@ def optimal_sparse_probing(exp_cfg, activation_dataset, feature_labels, regulari
     regularization : float, optional defaults to 1/n**0.5
     """
     import gurobipy as gp
-    os.environ['GRB_LICENSE_FILE'] = "/home/jackk/gurobi.lic"
 
     X_train, X_test, y_train, y_test = split_and_preprocess(
         exp_cfg, activation_dataset, feature_labels)
@@ -771,6 +798,7 @@ def compare_feature_selection(exp_cfg, activation_dataset, feature_labels, filte
 
 INNER_LOOP_FNS = {
     'dense_probe': dense_probe,
+    'average_activation': average_activation,
     'enumerate_monosemantic': enumerate_monosemantic,
     'optimal_sparse_probing': optimal_sparse_probing,
     'osp_tuning': osp_tuning,

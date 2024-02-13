@@ -34,6 +34,7 @@ class ExperimentConfig:
         self.iterative_pruning_n_prune_steps = args.get(
             'iterative_pruning_n_prune_steps', 10)
         self.max_per_class = args.get('max_per_class', -1)
+        self.min_layer = args.get('min_layer', 0)
 
 
 @dataclass

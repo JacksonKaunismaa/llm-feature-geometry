@@ -20,6 +20,8 @@ from activations.test import (
 from make_feature_datasets import prepare_feature_dataset
 
 
+import psutil
+
 def make_activation_probe_dataset(args, model):
     '''
     Make the activation probe dataset
@@ -27,11 +29,12 @@ def make_activation_probe_dataset(args, model):
     args = vars(parser.parse_args())
     feature_dataset_cfg = parse_dataset_args(args['feature_dataset'])
     exp_cfg = ExperimentConfig(args, feature_dataset_cfg)
-
+    print('did cfgs, mem usage:', psutil.virtual_memory().percent)
     feature_dataset_info = prepare_feature_dataset(exp_cfg)
     tokenized_dataset, feature_datasets = feature_dataset_info
-
+    print('did feature dataset, mem usage:', psutil.virtual_memory().percent)
     index_mask = make_index_mask(exp_cfg, tokenized_dataset, feature_datasets)
+    print('did index mask, mem usage:', psutil.virtual_memory().percent)
 
     start_time = time.perf_counter()
     # note that this fn saves the activations to disk
@@ -208,6 +211,9 @@ if __name__ == '__main__':
     parser.add_argument(
         '--auto_restrict_neuron_subset_file', action='store_true',
         help='automatically restrict the neuron subset file to only include neurons that correspond to the data distribution.')
+    parser.add_argument(
+        '--min_layer', type=int, default=0,
+        help='minimum layer to probe (will still compute them all, but helps with memory if things are crashing)')
     # params specific to all activations
     parser.add_argument(
         '--layers', nargs='+', type=int, default=None)

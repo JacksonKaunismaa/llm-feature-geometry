@@ -3,3 +3,5 @@ results
 .vscode
 **/.ipynb_checkpoints
 scripts/log
+*.png
+*.pdf

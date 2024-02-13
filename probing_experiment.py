@@ -175,6 +175,9 @@ if __name__ == "__main__":
         '--gurobi_timeout', default=60, type=int, help='Max time (seconds) to let Gurobi solve')
     parser.add_argument(
         '--gurobi_verbose', default=False, type=bool, help='Print out full gurobi logs')
+    parser.add_argument(
+        '--min_layer', default=0, type=int, 
+        help='Probe will be run on all layers after min_layer.')
     # inner loop specific params
     parser.add_argument(
         '--iterative_pruning_fixed_k', default=5, type=int,
@@ -204,7 +207,7 @@ if __name__ == "__main__":
     task_count = int(os.getenv('SLURM_ARRAY_TASK_COUNT', 1))
     layers = list(range(task_id-1, n_layers, task_count))
 
-    for layer in layers:
+    for layer in layers[args['min_layer']:]:
         run_probe_on_layer(
             exp_cfg,
             tokenized_dataset,

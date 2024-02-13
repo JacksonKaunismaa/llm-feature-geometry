@@ -7,6 +7,8 @@ from torch.utils.data import DataLoader
 from .quantize import quantize_8bit, unquantize_8bit
 
 
+import psutil
+
 # TODO(wesg): add a helper function to delete activations from disk
 
 
@@ -43,6 +45,7 @@ def load_activation_probing_dataset(exp_cfg, layer, to_numpy=True):
 
 def save_activation_probing_dataset(exp_cfg, layer_activations, output_precision=16, shard=-1):
     save_path = get_activation_dataset_path(exp_cfg)
+    print('saving activations start, mem usage:', psutil.virtual_memory().percent)
     if not os.path.exists(save_path):
         os.makedirs(save_path, exist_ok=True)
     shard_name = str(shard).zfill(5) if shard >= 0 else 'all'
@@ -51,13 +54,17 @@ def save_activation_probing_dataset(exp_cfg, layer_activations, output_precision
 
         if output_precision == 8:
             activations, offset, scale = quantize_8bit(activations)
+            print('quantized activations, mem usage:', psutil.virtual_memory().percent)
             quant_info = torch.vstack([offset, scale])
+            print('stacked, mem usage:', psutil.virtual_memory().percent)
             quant_file_name = os.path.join(
                 save_path, f'{l}.{shard_name}.quant_info.pt')
             torch.save(quant_info, quant_file_name)
+            print('saved quant info, mem usage:', psutil.virtual_memory().percent)
 
         file_name = os.path.join(save_path, f'{l}.{shard_name}.pt')
         torch.save(activations, file_name)
+        print('saved activations, mem usage:', psutil.virtual_memory().percent)
 
 
 def make_index_mask(exp_cfg, tokenized_dataset, feature_datasets):
@@ -119,7 +126,7 @@ def get_activation_dataset(
     layers='all', disk_flush_size=-1, index_mask=None, device=None, output_precision=16
 ):
     if layers == 'all':
-        layers = list(range(model.cfg.n_layers))
+        layers = list(range(exp_cfg.min_layer, model.cfg.n_layers))
     if device is None:
         device = model.cfg.device
 
@@ -127,7 +134,7 @@ def get_activation_dataset(
         (f'blocks.{layer_ix}.{exp_cfg.probe_location}', save_activation)
         for layer_ix in layers
     ]
-
+    print('created hook list, mem usage:', psutil.virtual_memory().percent)
     n_seq, ctx_len = tokenized_dataset['tokens'].shape
     activation_rows = sum(index_mask) \
         if exp_cfg.activation_aggregation is None \
@@ -135,15 +142,19 @@ def get_activation_dataset(
     activation_rows = min(activation_rows, disk_flush_size) \
         if disk_flush_size > 0 \
         else activation_rows
+    print('created activation rows, mem usage:', psutil.virtual_memory().percent)
 
     layer_activations = {
         l: torch.zeros(activation_rows, model.cfg.d_mlp, dtype=torch.float16)
         for l in layers
     }
+    print('created layer activations, mem usage:', psutil.virtual_memory().percent)
+    print('save shapes:', [la.shape for la in layer_activations.values()])
     layer_offsets = {l: 0 for l in layers}
     bs = exp_cfg.batch_size
     dataloader = DataLoader(
         tokenized_dataset['tokens'], batch_size=bs, shuffle=False)
+    print('created dataloader, mem usage:', psutil.virtual_memory().percent)
 
     for step, batch in enumerate(tqdm(dataloader, disable=False)):
         model.run_with_hooks(
@@ -165,6 +176,9 @@ def get_activation_dataset(
                 offset:offset+save_rows] = processed_activations
 
             layer_offsets[layers[lix]] += save_rows
+
+        if step % 5 == 0:
+            print('step', step, 'mem usage:', psutil.virtual_memory().percent)
 
         model.reset_hooks()
 

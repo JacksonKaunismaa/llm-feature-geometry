@@ -1,7 +1,5 @@
-export RESULTS_DIR=/home/jackk/projects/def-papyan/jackk/results
-export FEATURE_DATASET_DIR=/home/jackk/projects/def-papyan/jackk/sparse_datasets
-export TRANSFORMERS_CACHE=/home/jackk/projects/def-papyan/jackk/downloads
-export HF_DATASETS_CACHE=/home/jackk/projects/def-papyan/jackk/downloads
-export HF_HOME=/home/jackk/projects/def-papyan/jackk/downloads
-export HF_HUB_OFFLINE=1
-export GRB_LICENSE_FILE=/home/jackk/gurobi.lic
+export RESULTS_DIR=/home/jack/work/sparse-probing-paper/results
+export FEATURE_DATASET_DIR=/home/jack/work/superposition/sparse_datasets
+export TRANSFORMERS_CACHE=/home/rob/Data2/huggingface/transformers
+export HF_DATASETS_CACHE=/home/rob/Data2/huggingface/datasets
+export HF_HOME=/home/rob/Data2/huggingface
