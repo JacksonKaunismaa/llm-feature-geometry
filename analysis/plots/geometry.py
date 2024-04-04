@@ -10,12 +10,15 @@ import scipy
 from .. import load_results
 
 def find_good_ratio(size):
-    """Given a size, find the closest ratio of rows to columns that is as close to a square as possible."""
+    """Given a size, find the closest (height,width) ratio of rows to columns that is as close to a square as possible."""
     start_width = int(np.sqrt(size))
-    for width in range(start_width+1, 0, -1):
-        if size % width == 0:
+    width = start_width
+    # for width in range(start_width+1, 0, -1):
+    #     if size % width == 0:
+    #         break
+    for height in range(size//width, size, 1):
+        if height*width >= size:
             break
-    height = size//width
     return min(height, width), max(height, width)  # height, width
 
 
@@ -29,7 +32,7 @@ def tsne_activations(results_dict, split_by_layer=False):
     Returns:
     tsne_results: np.ndarray, (layers, feats, 2)
     feature_names: dict, {dset_name: [feat_names]}"""
-    layer_coefs = load_results.coefs_to_numpy(results_dict) # (layer, feat, coef)
+    layer_coefs = load_results.extract_feats_and_concatenate(results_dict) # (layer, feat, coef)
     feature_names = {dset_name: [feat for feat in dset_feats.keys()] for dset_name, dset_feats in results_dict.items()}
     if split_by_layer:
         tsne_results = np.stack([TSNE(n_components=2).fit_transform(coefs) for coefs in layer_coefs], axis=0)
@@ -100,18 +103,24 @@ def plot_tsne_agg_layers(tsne_results, feature_names, title_text=None):
 
 def get_grams(results_dict, feature_set=None):
     """Compute gram matrices of the normalized coefficients/feature vectors and gram matrices that result
-      from random coefficient vectors with the same global mean and standard devitaion as the actual coefficients. 
-      We also return the normalized actual coefficients and random coefficients, as well as the feature names.
+      from random coefficient vectors with the same global mean and standard devitaion as the actual coefficients.
       
       Args:
       results_dict: dict of dicts, {dset_name: {feat_name: (layer, hidden_dim)}}
-      feature_set: str, the feature subset to use. If None, we use all feature sets."""
+      feature_set: str, the feature subset to use. If None, we use all feature sets.
+      
+      Returns:
+      grams: np.ndarray, (feats, feats, layers, layers)
+      rand_grams: np.ndarray, (feats, feats, layers, layers)
+      norm_coefs: np.ndarray, (layers, feats, hidden_dim)
+      rand_coefs: np.ndarray, (layers, feats, hidden_dim)
+      feature_names: list of str, the feature names."""
     
     if feature_set is None:
-        coefs_only = load_results.coefs_to_numpy(results_dict)
+        coefs_only = load_results.extract_feats_and_concatenate(results_dict)  # (layers, feats, hidden_dim)
         feature_names = [feat for dset_name, dset_feats in results_dict.items() for feat in dset_feats.keys()]
     else:
-        coefs_only = load_results.coefs_to_numpy(results_dict[feature_set])
+        coefs_only = load_results.extract_feats_and_concatenate(results_dict[feature_set])
         feature_names = list(results_dict[feature_set].keys())
     norm_coefs = coefs_only / np.linalg.norm(coefs_only, axis=-1, keepdims=True)
     grams = einops.einsum(norm_coefs, norm_coefs, 'l1 f1 k, l2 f2 k -> f1 f2 l1 l2')
@@ -242,6 +251,31 @@ def plot_multi_grams(coefs_dict, good_keys, overall_title, sv_name, layer=8):
     width_per = 400 if ncols > 2 else 500
     fig.update_layout(height=height_per*nrows, width=width_per*ncols, title_text=overall_title)#, xaxis_title='Feature 1', yaxis_title='Feature 2')
     fig.write_image(sv_name)
+    fig.show()
+
+
+
+def plot_gram_grid(grams, titles, axes=None, sv_name=None):
+    """Plot a grid of gram matrices, where grams is just a list of gram matrices."""
+
+    nrows, ncols = find_good_ratio(len(grams))
+    fig = make_subplots(rows=nrows, cols=ncols, subplot_titles=titles)
+    for i, gram in enumerate(grams):
+        fig.add_trace(go.Heatmap(z=gram, coloraxis='coloraxis'), row=i//ncols+1, col=i%ncols+1)
+        if axes is not None and axes[i] is not None:
+            next(fig.select_xaxes(row=i//ncols+1, col=i%ncols+1)).update(tickmode='array', 
+                                                               ticktext=axes[i], 
+                                                               tickvals=np.arange(len(axes[i])),
+                                                               showticklabels=True)
+            next(fig.select_yaxes(row=i//ncols+1, col=i%ncols+1)).update(tickmode='array',
+                                                                ticktext=axes[i], 
+                                                                tickvals=np.arange(len(axes[i])),
+                                                                showticklabels=False)
+    fig.update_layout(coloraxis=dict(colorscale='RdBu', cmin=-1, cmax=1))
+    fig.update_layout(height=500*nrows, width=500*ncols, title='Gram Matrices')
+
+    if sv_name is not None:
+        fig.write_image(sv_name)
     fig.show()
 
 

@@ -113,7 +113,7 @@ def get_probe_result(results_dir, model_name, experiment_name, probe_type, probe
                     results[dset][feat_name][layer] -= mean_coefs[layer]
     return results
 
-def coefs_to_numpy(results_dict):
+def extract_feats_and_concatenate(results_dict):
     """given {dset: {feat_name: coefs ndarray(layers, hidden)}} return ndarray(layers, feats, hidden)
     OR, given {feat_name: ndarray of coefs (layers, hidden)} return ndarray(layers, feats, hidden)"""
     first_elem = next(iter(results_dict.values()))
