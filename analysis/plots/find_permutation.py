@@ -60,7 +60,7 @@ def greedy_permute(input_diffs, target_diffs, max_iter=1000):
         # print(f"Iteration {it+1}, curr_cost: {curr_cost}, {best_cost=}")
 
         if np.isclose(best_cost-curr_cost, 0) or np.isclose(best_cost, 0):
-            print(best_swap)
+            # print(best_swap)
             break
     
     return curr_perm, curr_cost

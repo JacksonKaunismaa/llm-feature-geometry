@@ -11,6 +11,8 @@ from .. import load_results
 
 def find_good_ratio(size):
     """Given a size, find the closest (height,width) ratio of rows to columns that is as close to a square as possible."""
+    if size == 1:
+        return 1, 1
     start_width = int(np.sqrt(size))
     width = start_width
     # for width in range(start_width+1, 0, -1):

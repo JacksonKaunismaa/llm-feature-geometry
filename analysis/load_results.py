@@ -118,6 +118,6 @@ def extract_feats_and_concatenate(results_dict):
     OR, given {feat_name: ndarray of coefs (layers, hidden)} return ndarray(layers, feats, hidden)"""
     first_elem = next(iter(results_dict.values()))
     if isinstance(first_elem, dict):
-        return np.stack([coefs for dset in results_dict.values() for coefs in dset.values() ], axis=1)
+        return np.stack([coefs for dset in results_dict.values() for coefs in dset.values()], axis=1)
     elif isinstance(first_elem, np.ndarray):  # given {feat_name: ndarray of coefs (num_layers, hidden_size)}
         return np.stack([coefs for coefs in results_dict.values()], axis=1)  # return ndarray of (num_layers, num_feats, hidden_size)
