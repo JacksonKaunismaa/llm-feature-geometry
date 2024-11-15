@@ -1,7 +1,7 @@
 # Energy Minization in LLM MLP features
 Code repository for my undergraduate thesis "An Investigation into Energy Minimization Properties of MLP Features in LLMs", working with Professor Vardan Papyan.
 
-Infrastructure for feature exctraction based upon [Finding Neurons in a Haystack: Case Studies with Sparse Probing](https://arxiv.org/abs/2305.01610)
+Infrastructure for feature extraction based upon [Finding Neurons in a Haystack: Case Studies with Sparse Probing](https://arxiv.org/abs/2305.01610)
 
 ## Organization
 The code for computing energy minimization plots for actual features can be found at `analysis/plots/energy.py`. The optimal feature test case, as well as some helper functions, can be found at `analysis/plots/geometry.py`. The code for permutating the Gram matrices can be found at `analysis/plots/find_permutation.py`.
