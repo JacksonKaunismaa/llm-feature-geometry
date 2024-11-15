@@ -1,27 +1,21 @@
-# sparse-probing
-Code repository for [Finding Neurons in a Haystack: Case Studies with Sparse Probing](https://arxiv.org/abs/2305.01610)
+# Energy Minization in LLM MLP features
+Code repository for my undergraduate thesis "An Investigation into Energy Minimization Properties of MLP Features in LLMs", working with Professor Vardan Papyan.
 
-Pardon our mess. The basic core of sparse probing can be implemented very easily with just sklearn applied to a dataset of activations acquired with raw Pytorch hooks or TransformerLens. This repository is almost all experimental infrastructure and analysis specific to our set up of datasets and compute (slurm).
-
-See [this](https://github.com/wesg52/llm-context-neurons/tree/main) repository for a minimal replication of finding context neurons.
+Infrastructure for feature exctraction based upon [Finding Neurons in a Haystack: Case Studies with Sparse Probing](https://arxiv.org/abs/2305.01610)
 
 ## Organization
-We expect most people to simply be interested in a large list of relevant neurons, available as CSVs within `interpretable_neurons/`. Note these are for the Pythia V0 models, which have since been updated on HuggingFace.
+The code for computing energy minimization plots for actual features can be found at `analysis/plots/energy.py`. The optimal feature test case, as well as some helper functions, can be found at `analysis/plots/geometry.py`. The code for permutating the Gram matrices can be found at `analysis/plots/find_permutation.py`.
 
-Our top level scripts for saving activations and running probing experiments can be count in `get_activations.py` and `probing_experiment.py`. All of command line argument configurations can be viewed in the `experiments/` directory, which contain all of the slurm scripts we used to run our experiments.
+Apart from some minor changes to infrastructure and a helper function or two, those are the primary changes introduced in this repository compared to the original paper.
 
-`probing_datasets/` contain the modules required to make and prepare all of our feature datasets. We recommend simply downloading them from [].
-
-Analysis and plotting code is distributed within individual notebooks and `analysis/`.
+To browse over already computed examples (likely confusingly ordered), you can also look at `notebooks/explore.ipynb`.
 
 
-## Instructions for reproducing
-Note that our full experiments generate well over 1 TB of data and require substantial GPU and CPU time.
 
 ### Getting started
 Create virtual environment and install required packages
 ```
-git clone https://github.com/wesg52/sparse-probing-paper.git
+git clone https://github.com/JacksonKaunismaa/sparse-probing-paper.git
 cd sparse-probing
 pip install virtualenv
 python -m venv sparprob
@@ -42,8 +36,8 @@ export HF_HOME=/Users/wesgurnee/Documents/mechint/sparse_probing/sparse-probing/
 ```
 
 
-## Cite us
-If you found our work helpful, please cite our paper:
+## Citation
+Citation for original paper:
 ```
 @article{gurnee2023finding,
   title={Finding Neurons in a Haystack: Case Studies with Sparse Probing},
